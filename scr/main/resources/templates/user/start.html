@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="author" content="bred<" />
+	<meta name="keywords" content="bred<" />
+	<meta name="description" content="bred<" />
+	<meta name="robots" content="all" />
+	<title>Testy</title>
+	
+	<script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js'></script>
+	<link rel="stylesheet" href="/css/user/start.css"/>
+	<link href='http://fonts.googleapis.com/css?family=Asap:400,700' rel='stylesheet' type='text/css'/>
+	<link rel='stylesheet' href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css'/>	 
+
+
+
+</head>
+
+<body>
+<div id="wrapper">
+	<div id="top">
+    	<h1 class="logo">U<span class="green1">MCS</span> LUBLIN</h1>
+    </div>
+    <div class="user" th:if="${login} != null">
+    <span class="logout" th:text="'Użytkownik: ' + ${login}"></span>
+    <form th:action="@{/app-logout}" method="POST">
+	         <input class="logoutbutton" type="submit" value="Wyloguj"/>
+	</form>
+    </div>
+    
+    <div id="main">
+    	<table id="table">
+    		<tr>
+    			<td colspan="4"><span th:text="'Przygotuj się do testu. Podczas rozwiązywania przydatne'" ></span>
+    			<span th:text="' mogą być zeszyt lub kawałek kartki do przeprowadzania obliczeń i coś do'"></span>
+    			<span th:text="' pisania. Na cały test przeznaczone jest '"></span>
+    			<span style="color: red;" th:text="${time}+' min'"></span>
+    			<span th:text="' od chwili rozpoczęcia testu. Test zawiera '"></span>
+    			<span style="color: red;" th:text="${numberOfQuestion}"></span>
+    			<span style="color: red;" th:if="${numberOfQuestion < 5}" th:text="' pytania'"></span>
+    			<span style="color: red;" th:unless="${numberOfQuestion < 5}" th:text="' pytań'"></span>
+    			<span th:text="' i jest testem '"></span>
+    			<span style="color: red;" th:if="${single}" th:text="'jednokrotnego wyboru.'"></span>
+    			<span style="color: red;" th:unless="${single}" th:text="'wielokrotnego wyboru.'"></span>
+    			</td>
+    		</tr>
+    		<tr>
+    			<td width="150px"></td>
+    			<td><form th:action="@{'/app/test'}" method="GET">
+	         		<input class="logoutbutton" type="submit" value="Wróć"/>
+					</form></td>
+    			<td><form th:action="@{'/test/solvestart'+${testnumber}}" method="GET">	
+	         		<input class="logoutbutton" type="submit" value="Rozpocznij test"/>
+					</form></td>
+    			<td></td>
+    		</tr>
+    	
+    	</table>
+    </div>
+    <div id="footer">
+    	<p>© Copyright 2012. All Rights Reserved. <br />
+        <span class="darkgrey">Design by <a href="http://www.prontomoda.de/" title="Handtaschen">M.Wołoszkiewicz</a></span></p>
+    </div>
+</div>
+</body>
+
+</html>

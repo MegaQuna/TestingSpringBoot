@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="author" content="bred<" />
+	<meta name="keywords" content="bred<" />
+	<meta name="description" content="bred<" />
+	<meta name="robots" content="all" />
+	<title>Testy</title>
+	
+	<script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js'></script>
+	<link rel="stylesheet" href="/css/all/index.css"/>
+	<link href='http://fonts.googleapis.com/css?family=Asap:400,700' rel='stylesheet' type='text/css'/>
+	<link rel='stylesheet' href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css'/>	 
+
+
+
+</head>
+
+<body>
+<div id="wrapper">
+	<div id="top">
+    	<h1 class="logo">U<span class="green1">MCS</span> LUBLIN</h1>
+        <ul id="topnavi">
+        		<li id="start" class="btn"><a href="/app/index">Strona Startowa</a></li>
+				<li id="informacje" class="btn"><a href="/app/info">Informacje</a></li>
+				<li sec:authorize="hasRole('USER')" id="test" class="active"><a href="/app/test">Testy</a></li>
+				<li id="logowanie" class="btn"><a href="/app/login">Logowanie</a></li>
+				<li sec:authorize="hasRole('ADMIN')"><a href="/admin/index">Panel Administratora</a></li>
+        </ul>
+    </div>
+    <div class="user" th:if="${login} != null">
+    <span class="logout" th:text="'Użytkownik: ' + ${login}"></span>
+    <form th:action="@{/app-logout}" method="POST">
+	         <input class="logoutbutton" type="submit" value="Wyloguj"/>
+	</form>
+    </div>
+    <div id="header">
+    	<img src="/img/header.jpg" alt="" width="1250" height="183" />
+    </div>
+    <div id="main">
+    	<table>
+    	<tr  th:each="test : ${tests}">
+    		<td th:unless="${test.getSingleStatus()}" style="font-size: 11pt;"><span style="font-weight: bold;" th:text="'Test Wielokrotnego wyboru '+${test.getNameofCurseTest()}+', Status: '"></span></td>
+    		<td th:if="${test.getSingleStatus()}" style="font-size: 11pt;"><span style="font-weight: bold;" th:text="'Test Jednokrotnego wyboru '+${test.getNameofCurseTest()}+', Status: '"></span></td>
+    		<td colspan="2" style="font-size: 11pt;" th:if="${!test.getAvailable()}"><span th:if="${!test.getAvailable() and test.getFirst_init() and !test.getRating()}" style="color: #f4b042;" th:text="'Zakończony nieoceniony'"></span>
+    		<span th:if="${!test.getAvailable() and test.getFirst_init() and test.getRating()}">
+    		<span style="color: #f4b042;" th:text="'Zakończony '"></span>
+    		<span th:if="${test.getResult()>2}" style="color: green;" th:text="'(Ocena: '+${test.getResult()}+' , punktów/Max: '+${test.getScore()}+'/'+${test.getPosibleMaxScore()}+' )'"></span>
+    		<span th:unless="${test.getResult()>2}" style="color: red;" th:text="'(Ocena: '+${test.getResult()}+' , punktów/Max: '+${test.getScore()}+'/'+${test.getPosibleMaxScore()}+' )'"></span></span>
+    		
+    		<span th:if="${!test.getAvailable() and !test.getFirst_init() and !test.getTestEvenStart()}" style="color: blue;" th:text="'Nierozpoczęty'"></span>
+    		<span th:if="${!test.getAvailable() and !test.getFirst_init() and test.getTestEvenStart()}" style="color: red;" th:text="'Brak obecności na teście'"></span>
+    		</td>
+    		<td th:if="${test.getAvailable()}" style="font-size: 11pt;"><span th:if="${test.getAvailable()}" style="color: green;" th:text="'Dostępny'"></span></td>
+    		<td th:if="${test.getAvailable() and !test.getFirst_init()}"><form th:action="@{'/test/start'+${test.getIdtest()}}" method="GET"><input class="logoutbutton" style="float: left;" type="submit" value="Rozwiąż test"/></form></td>
+			<td th:if="${test.getAvailable() and test.getFirst_init()}"><form th:action="@{'/test/solvestart'+${test.getIdtest()}}" method="GET">
+	         		<input class="logoutbutton" type="submit" value="Kontynuuj test"/>
+					</form></td>    	
+    	</tr>
+    	</table> 
+        </div>
+    <div id="footer">
+    	<p>© Copyright 2012. All Rights Reserved. <br />
+        <span class="darkgrey">Design by <a href="http://www.prontomoda.de/" title="Handtaschen">M.Wołoszkiewicz</a></span></p>
+    </div>
+</div>
+</body>
+
+</html>

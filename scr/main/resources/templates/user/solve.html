@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="author" content="bred<" />
+	<meta name="keywords" content="bred<" />
+	<meta name="description" content="bred<" />
+	<meta name="robots" content="all" />
+	<title>Testy</title>
+	
+	<script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js'></script>
+	<link rel="stylesheet" href="/css/adminpanel/adminpanel.css"/>
+	<link rel="stylesheet" href="/css/adminpanel/adminpanel_right_site.css"/>
+	<link href='http://fonts.googleapis.com/css?family=Asap:400,700' rel='stylesheet' type='text/css'/>
+	<link rel='stylesheet' href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css'/>	 
+
+
+
+</head>
+
+<body>
+<div id="wrapper">
+	<div id="top">
+    	<h1 class="logo">U<span class="green1">MCS</span> LUBLIN</h1>
+    </div>
+    <div class="user" th:if="${login} != null">
+    <span class="logout" th:text="'Użytkownik: ' + ${login}"></span>
+    <form th:action="@{/app-logout}" method="POST">
+	         <input class="logoutbutton" type="submit" value="Wyloguj"/>
+	</form>
+    </div>
+    
+    <div id="main" align="center" style="display: flex; justify-content: center; align-items: center;">
+    <div th:if="${error}" th:text="${error}"></div>
+    <form th:unless="${error}" th:action="@{'/test/solve'+${test}}" method="POST" id="test">
+    <input style="visibility: hidden;" name="id" th:value="${testquestion.getQuestion_number()}"/>
+       <table style="border-radius: 12pt;">
+       	<tr>
+       		<td style="border-left: none; border-right: none; border-top: none; text-align: left; padding-left: 10px;"><span style="font-weight: bold;" th:text="'Pytanie: '+${testquestion.getQuestion_number()}+'/'+${max}"></span><span style="float: right; padding-right: 10px; font-weight: bold;"><span style="font-weight: bold;" th:text="'Pozostało: '"></span><span style="font-weight: bold;color: green;" id="time"></span ></span></td>	
+       	</tr>
+      	<tr>
+      		<td width="600px" colspan="4" style="border-left: none; border-right: none; border-top: none; " align="center">
+      			<table style="border: none; margin: 0 auto;">
+      				<tr th:if="${question.getImgFile()!= null}">
+						<td style="border: none; vertical-align: middle;"><img style="border-radius: 12pt;" width="300" alt="coś poszło nie tak" th:src="@{'data:image/jpg;base64,'+${question.generateBase64Image()}}"></td>     							
+      				</tr>
+      				<tr>
+						<td style="border: none; text-align: center;"><span style="text-align: center;" th:text="${question.getContent_question()}"></span></td>    							
+      				</tr>
+      			</table>
+      				
+      		</td>
+      	</tr>
+      	
+      	<tr th:each="answer : ${question.getAnsweres()}">
+      		<td style="border: none;">
+      			<table style="border:none;">
+      				<tr>
+      					<td th:if="${question.getSingle() and testquestion.getChceck(answer.getIdanswere())}" style="border: none;"><input type="radio"  name="single" th:value="${answer.getIdanswere()}" checked="checked"/></td>
+      					<td th:if="${question.getSingle() and !testquestion.getChceck(answer.getIdanswere())}" style="border: none;"><input type="radio"  name="single" th:value="${answer.getIdanswere()}"/></td>
+      					<td th:if="${!question.getSingle() and testquestion.getChceck(answer.getIdanswere())}" style="border: none;"><input type="checkbox" name="multi" th:value="${answer.getIdanswere()}" checked="checked"/></td>
+      					<td th:if="${!question.getSingle() and !testquestion.getChceck(answer.getIdanswere())}" style="border: none;"><input type="checkbox" name="multi" th:value="${answer.getIdanswere()}"/></td>
+      					<td style="border: none;"><span th:text="${answer.getAnswere()}"></span></td>
+						<td th:if="${answer.getImgFile()!= null}" style="border: none; vertical-align: middle;"><span></span><img style="border-radius: 12pt;" width="300" alt="coś poszło nie tak" th:src="@{'data:image/jpg;base64,'+${answer.generateBase64Image()}}"></td> 	
+      				</tr>
+      			</table>
+      		</td>
+      	</tr>
+      	<tr>
+      		<td style="border-left: none; border-right: none; border-bottom: none;" >
+      		<input style="float: left; margin-left: 20px;" class="logoutbutton" type="submit" name="action" value="Poprzednie"/>
+      		<input style="float: none;" class="logoutbutton" type="submit" name="action" value="Zakończ"/>
+      		<input style="float: right;" class="logoutbutton" type="submit" name="action" value="Następne"/></td>
+      	</tr>
+    </table>
+    </form>
+     <div th:if="${error}"><form th:action="@{'/app/test'}" method="GET"><input class="logoutbutton" type="submit" value="Wróć"/></form></div>
+    <script th:inline="javascript">/*<![CDATA[*/
+				var mstime = /*[[${timeleft}]]*/ 'default';
+				var x = setInterval(function() {
+		  		var minutes = Math.floor((mstime % (1000 * 60 * 60)) / (1000 * 60));
+		  		var seconds = Math.floor((mstime % (1000 * 60)) / 1000);
+		  		document.getElementById("time").innerHTML =minutes + "m " + seconds + "s ";
+		  		if (mstime < 0) {
+		    		clearInterval(x);
+		    		document.getElementById("time").innerHTML = "Czas miną";
+		  		}
+		  		mstime=mstime-1000;
+			}, 1000);   	
+		/*]]>*/
+	</script>
+    </div>
+    <div id="footer">
+    	<p>© Copyright 2012. All Rights Reserved. <br />
+        <span class="darkgrey">Design by <a href="http://www.prontomoda.de/" title="Handtaschen">M.Wołoszkiewicz</a></span></p>
+    </div>
+</div>
+</body>
+
+</html>

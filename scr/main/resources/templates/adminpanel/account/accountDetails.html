@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="Piotr Cyll"/>
+	<meta name="Test service" />
+	<meta name="Service for testing students" content="piotr.cyll@gmail.com" />
+	<title>Testy</title>
+	
+	<script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js'></script>
+	<link rel='stylesheet' href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css'/>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="/css/adminpanel/adminpanel.css"/>
+	<link rel="stylesheet" href="/css/adminpanel/adminpanel_right_site.css"/>
+	<link href='http://fonts.googleapis.com/css?family=Asap:400,700' rel='stylesheet' type='text/css'/>
+</head>
+
+<body>
+<div id="wrapper">
+	<div id="top">
+    	<h1 class="logo">U<span class="green1">MCS</span> LUBLIN</h1>
+        <ul id="topnavi">
+        		<li id="start" class="btn"><a href="/app/index">Strona Startowa</a></li>
+				<li id="informacje" class="btn"><a href="/app/info">Informacje</a></li>
+				<li sec:authorize="hasRole('USER')" id="test" class="btn"><a href="/app/test">Testy</a></li>
+				<li id="logowanie" class="btn"><a href="/app/login">Logowanie</a></li>
+				<li id="Admin" class="active" sec:authorize="hasRole('ADMIN')"><a href="/admin/index">Panel Administratora</a></li>
+        </ul>
+    </div>
+    <div class="user" th:if="${login} != null">
+    <span class="logout" th:text="'Użytkownik: ' + ${login}"></span>
+    <form th:action="@{/app-logout}" method="POST">
+	         <input class="logoutbutton" type="submit" value="Wyloguj"/>
+	</form>
+    </div>
+    <div id="header">
+    	<img src="/img/header.jpg" alt="" width="1250" height="183" />
+    </div>
+   
+    <div id="main">
+    	<div id="left-part">
+        	<h1>Kategorie</h1>
+            <ul id="subnavi">
+                <li id="mainPanel" class="btn"><a href="/admin/index">Panel główny</a></li>
+                <li id="groupManagement" class="btn"><a href="/admin/groupManagement">Zarządzanie grupami</a></li>
+                <li id="courseManagement" class="btn"><a href="/admin/courseManagement">Zarządzanie kursami</a></li>
+                <li id="accountManagement" class="active"><a href="/admin/accountManagementAll/true">Zarządzanie użytkownikami</a></li>
+                <li id="testManagement" class="btn"><a href="/admin/testManagement">Zarządzanie testami</a></li>
+                <li id="scoreAndResultManagement" class="btn"><a href="/admin/scoreAndResultManagement">Zarządzanie systemem ocen</a></li>
+               
+            </ul>
+            
+            <h1>Additional content</h1>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ornare elementum neque at lobortis. 
+            Fusce ac orci diam. Ut ac tellus in lorem commodo vulputate a vitae ligula. Proin nisl lectus, lacinia id 
+            egestas eu, hendrerit id purus.</p>
+        </div>
+    	<div id="right-part">
+			<table th:if="${user} != null" id="user_details" >
+      <tr >
+        <th colspan="5" width="1000px" th:text="'Szczegóły Użytkownika '+${user.getUsername()}"></th>
+      </tr>
+      <tr>
+        <td width="100px">Imię i nazwisko:</td>
+        <td width="200px" th:text="${user.getSurname()}+' '+${user.getName()}"></td>
+        <td width="100px">Iloś rozwiązanych testów:</td>
+        <td colspan="2" width="200px" th:text="${#arrays.length(user.getTests())}"></td>
+      </tr>
+       <tr >
+        <td width="100px">Przypisana rola:</td>
+        <td width="200px" th:if="${user.getAuthorityName() != null}" th:text="${user.getAuthorityName()}"></td>
+        <td width="200px" th:unless="${user.getAuthorityName() != null}">Brak ustawień</td>
+        <td width="100px">Status konta:</td>
+        <td width="100px" th:if="${user.getEnabled()}" style="color: green;">Aktywne</td><td width="100px" th:if="${user.getEnabled()}"><button class="deactivationAccount" th:value="${user.getIdusername()}">Dezaktuwuj</button></td>
+		<td width="100px" th:unless="${user.getEnabled()}" style="color: red;">Nieaktywne</td><td width="100px" th:unless="${user.getEnabled()}"><button class="activationAccount" th:value="${user.getIdusername()}">Aktywuj</button></td>
+      </tr>
+      <tr >
+        <td width="100px">Kontakt mailowy:</td>
+        <td width="200px" th:text="${user.getEmail()}"></td>
+        <td width="100px">Blokada bezpieczeństwa:</td>
+        <th:block th:if="${user.badLoginStatus() != null}">
+        <td width="100px" th:unless="${user.badLoginStatus()}" style="color: green;">Niezablokowany</td>
+		<td width="100px" th:if="${user.badLoginStatus()}" th:text="'zablokowany do: '+${user.dateEndOfBadLoginBlock ()}" style="color: red;"></td><td width="100px" th:if="${user.badLoginStatus()}" ><button class="unlockAccount" th:value="${user.getIdusername()}" >Odblokuj</button></td>
+      	</th:block>
+      	<th:block th:unless="${user.badLoginStatus() != null}">
+        <td width="100px" style="color: red;">Brak ustawień zgłoś problem</td>
+      	</th:block>
+      </tr>
+       <tr >
+        <td width="100px">Zapisany do Grup:</td>
+        <td colspan="5"><span th:if="${user.getGroups()}" th:each="group : ${user.getGroups()}" ><a class="qroupmap"   th:attr="href='groupdetail'+${group.getIdgroups()}" th:text="${group.getGroupname()}"></a><button class="removegroup" th:value="${group.getIdgroups()}" data-th-attr="data-userid=${user.getIdusername()}">-</button><span th:text="', '" ></span></span>
+        				<span th:unless="${user.getGroups()}">Brak Przypisanych Grup</span></td>
+      </tr>
+      <tr >
+        <td width="100px">Rozwiązane testy:</td>
+        <td colspan="5">
+        <span th:if="${user.getTests()}" th:each="test : ${user.getTestsList()}" >
+        <a th:if="${test.getResult()>2 and test.getFirst_init()}" style="color:green;" th:attr="href=@{'/admin/testdetail'+${test.getTestsettingId()}}" th:text="${test.getNameofCurseTest()}+'(ocena:'+${test.getResult()}+' punkty:'+${test.getScore()}+'/'+${test.posibleMaxScore()}+' data:'+${test.dateOfTest()}+')'"></a>
+        <a th:if="${test.getResult()<3 and test.getFirst_init()}" style="color:red;" th:attr="href=@{'/admin/testdetail'+${test.getTestsettingId()}}" th:text="${test.getNameofCurseTest()}+'(ocena:'+${test.getResult()}+' punkty:'+${test.getScore()}+'/'+${test.posibleMaxScore()}+' data:'+${test.dateOfTest()}+')'"></a>
+        <a th:if="${!test.getFirst_init() and test.getTestEvenStart()}" style="color:red;" th:attr="href=@{'/admin/testdetail'+${test.getTestsettingId()}}" th:text="${test.getNameofCurseTest()}+'( Brak obecności na teście data:'+${test.dateOfTest()}+')'"></a>
+        <a th:if="${!test.getFirst_init() and !test.getTestEvenStart()}" style="color:red;" th:attr="href=@{'/admin/testdetail'+${test.getTestsettingId()}}" th:text="${test.getNameofCurseTest()}+'( Test jeszcze się nie odbył)'"></a>
+        <span th:text="', '" ></span><br></span>
+        <span th:unless="${user.getTests()}">Brak testów dla użytkownika</span></td>
+      </tr>
+      <tr >
+        <td colspan="5" width="1000px"><button class="TemplateAddGroup" th:value="${user.getIdusername()}">Zapisz użytkownika do grupy</button><button class="templateSetTestToUser" th:value="${user.getIdusername()}" >Przydziel test użytkownikowi</button></td>
+      </tr>
+      
+    </table>
+
+        </div>
+    </div>
+    <div id="footer">
+    	<p>
+				© Copyright 2018. All Rights Reserved. <br /> <span
+					class="darkgrey">Design by M.Wołoszkiewicz</span>
+			</p>
+    </div>
+    <script src="/js/adminpanel/account/accountDetails.js"></script>
+    
+</div>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+

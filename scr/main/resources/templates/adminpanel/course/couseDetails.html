@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="Piotr Cyll"/>
+	<meta name="Test service" />
+	<meta name="Service for testing students" content="piotr.cyll@gmail.com" />
+	<title>Testy</title>
+	
+	<script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js'></script>
+	<link rel='stylesheet' href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css'/>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="/css/adminpanel/adminpanel.css"/>
+	<link rel="stylesheet" href="/css/adminpanel/adminpanel_right_site.css"/>
+	<link href='http://fonts.googleapis.com/css?family=Asap:400,700' rel='stylesheet' type='text/css'/>
+	
+		 
+
+
+
+</head>
+
+<body>
+<div id="wrapper">
+	<div id="top">
+    	<h1 class="logo">U<span class="green1">MCS</span> LUBLIN</h1>
+        <ul id="topnavi">
+        		<li id="start" class="btn"><a href="/app/index">Strona Startowa</a></li>
+				<li id="informacje" class="btn"><a href="/app/info">Informacje</a></li>
+				<li sec:authorize="hasRole('USER')" id="test" class="btn"><a href="/app/test">Testy</a></li>
+				<li id="logowanie" class="btn"><a href="/app/login">Logowanie</a></li>
+				<li id="Admin" class="active" sec:authorize="hasRole('ADMIN')"><a href="/admin/index">Panel Administratora</a></li>
+        </ul>
+    </div>
+    <div class="user" th:if="${login} != null">
+    <span class="logout" th:text="'Użytkownik: ' + ${login}"></span>
+    <form th:action="@{/app-logout}" method="POST">
+	         <input class="logoutbutton" type="submit" value="Wyloguj"/>
+	</form>
+    </div>
+    <div id="header">
+    	<img src="/img/header.jpg" alt="" width="1250" height="183" />
+    </div>
+   
+    <div id="main">
+    	<div id="left-part">
+        	<h1>Kategorie</h1>
+            <ul id="subnavi">
+                <li id="mainPanel" class="btn"><a href="/admin/index">Panel główny</a></li>
+                <li id="groupManagement" class="btn"><a href="/admin/groupManagement">Zarządzanie grupami</a></li>
+                <li id="courseManagement" class="active"><a href="/admin/courseManagement">Zarządzanie kursami</a></li>
+                <li id="accountManagement" class="btn"><a href="/admin/accountManagementAll/true">Zarządzanie użytkownikami</a></li>
+                <li id="testManagement" class="btn"><a href="/admin/testManagement">Zarządzanie testami</a></li>
+                <li id="scoreAndResultManagement" class="btn"><a href="/admin/scoreAndResultManagement">Zarządzanie systemem ocen</a></li>
+               
+            </ul>
+            
+            <h1>Additional content</h1>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ornare elementum neque at lobortis. 
+            Fusce ac orci diam. Ut ac tellus in lorem commodo vulputate a vitae ligula. Proin nisl lectus, lacinia id 
+            egestas eu, hendrerit id purus.</p>
+        </div>
+    	<div id="right-part">
+			<table th:if="${course} != null" id="course_details" >
+      <tr >
+        <th colspan="4" width="1000px" th:text="'Szczegóły Kursu '+${course.getCoursename()}	"></th>
+        <th  th:if="${course.getArchive()}" width="100px" style="color: red;" th:text="'W archiwum'"></th>
+        <th  th:unless="${course.getArchive()}" width="100px" style="color:green;" th:text="'Dostępny'"></th>
+      </tr>
+      <tr>
+        <td colspan="2" width="150px">Opis kursu</td>
+        <td colspan="2" width="800px" th:text="${course.getDescription()}"></td>
+        <td width="100px" ><button class="courseDescriptionChange" th:value="${course.getIdcourse()}">Zmień opis</button></td>
+      </tr>
+      <tr >
+        <td colspan="2" width="150px">Przypisane grupy</td>
+        <td colspan="3" width="800px"><span th:each="group : ${course.getGroups()}" ><a class="groupmap" th:attr="href='groupdetail'+${group.getIdgroups()}" th:text="${group.getGroupname()}"></a><button data-th-attr="data-courseId=${course.getIdcourse()}" class="removegroup" th:value="${group.getIdgroups()}">-</button><span th:text="', '" ></span></span></td>
+      </tr>
+      <tr >
+        <td colspan="5" width="1000px"><b>Wykaz pytań</b></td>
+      </tr>
+      
+       <tr th:if="${#arrays.length(course.getQuestions(false, 1, true))} > 0">
+        <td rowspan="3" width="100px">Pytania jednokrotnego wyboru</td>
+        <td width="50px" >Stopień trudności 1</td>
+        <td width="100px" th:text="'ilość :'+${#arrays.length(course.getQuestions(false, 1, true))}" ></td>
+        <td width="700px">Dostępne pytania: <span th:each="Question : ${course.getQuestions(false, 1, true)}" ><a th:attr="href='../question/singleQuestion'+${Question.getIdquestion()}" th:text="${Question.getIdquestion()}"></a><span th:text="' , '" ></span></span> <span>Archiwalne: <span th:each="QuestionArchiwe : ${course.getQuestions(true, 1, true)}"><a th:attr="href='../question/singleQuestion'+${QuestionArchiwe.getIdquestion()}" th:text="${QuestionArchiwe.getIdquestion()}"></a><span th:text="' , '"></span></span ></span>  </td>
+		<td width="50px" ><button class="details" data-th-attr="data-courseid=${course.getIdcourse()}, data-single=true, data-dificulty=1">Przeglądaj pytania</button></td>      
+      </tr>
+      <tr th:if="${#arrays.length(course.getQuestions(false, 2, true))} > 0" >
+      	<td width="50px" >Stopień trudności 2</td>
+		<td width="100px" th:text="'ilość :'+${#arrays.length(course.getQuestions(false, 2, true))}" ></td>
+        <td width="700px">Dostępne pytania: <span th:each="Question : ${course.getQuestions(false, 2, true)}" ><a th:attr="href='../question/singleQuestion'+${Question.getIdquestion()}" th:text="${Question.getIdquestion()}"></a><span th:text="' , '" ></span></span> <span>Archiwalne: <span th:each="QuestionArchiwe : ${course.getQuestions(true, 2, true)}"><a th:attr="href='../question/singleQuestion'+${QuestionArchiwe.getIdquestion()}" th:text="${QuestionArchiwe.getIdquestion()}"></a><span th:text="' , '"></span></span ></span></td>
+      	<td width="50px" ><button class="details" data-th-attr="data-courseid=${course.getIdcourse()}, data-single=true, data-dificulty=2">Przeglądaj pytania</button></td> 
+      </tr>
+      <tr th:if="${#arrays.length(course.getQuestions(false, 3, true))} > 0">
+      	<td width="50px" >Stopień trudności 3</td>
+      	<td width="100px" th:text="'ilość :'+${#arrays.length(course.getQuestions(false, 3, true))}" ></td>
+        <td width="700px">Dostępne pytania: <span th:each="Question : ${course.getQuestions(false, 3, true)}" ><a th:attr="href='../question/singleQuestion'+${Question.getIdquestion()}" th:text="${Question.getIdquestion()}"></a><span th:text="' , '" ></span></span> <span>Archiwalne: <span th:each="QuestionArchiwe : ${course.getQuestions(true, 3, true)}"><a th:attr="href='../question/singleQuestion'+${QuestionArchiwe.getIdquestion()}" th:text="${QuestionArchiwe.getIdquestion()}"></a><span th:text="' , '"></span></span ></span></td>
+      	<td width="50px" ><button class="details" data-th-attr="data-courseid=${course.getIdcourse()}, data-single=true, data-dificulty=3">Przeglądaj pytania</button></td> 
+      </tr>
+      <tr th:if="${#arrays.length(course.getQuestions(false, 1, false))} > 0">
+        <td rowspan="3" width="100px">Pytania wielokrotnego wyboru</td>
+        <td width="50px" >Stopień trudności 1</td>
+        <td width="100px" th:text="'ilość :'+${#arrays.length(course.getQuestions(false, 1, false))}" ></td>
+        <td width="700px">Dostępne pytania: <span th:each="Question : ${course.getQuestions(false, 1, false)}" ><a th:attr="href='../question/singleQuestion'+${Question.getIdquestion()}" th:text="${Question.getIdquestion()}"></a><span th:text="' , '" ></span></span> <span>Archiwalne: <span th:each="QuestionArchiwe : ${course.getQuestions(true, 1, false)}"><a th:attr="href='../question/singleQuestion'+${QuestionArchiwe.getIdquestion()}" th:text="${QuestionArchiwe.getIdquestion()}"></a><span th:text="' , '"></span></span ></span></td>
+       	<td width="50px" ><button class="details" data-th-attr="data-courseid=${course.getIdcourse()}, data-single=false, data-dificulty=1">Przeglądaj pytania</button></td>  
+      </tr>
+      <tr th:if="${#arrays.length(course.getQuestions(false, 2, false))} > 0">
+      	<td width="50px" >Stopień trudności 2</td>
+      	<td width="100px" th:text="'ilość :'+${#arrays.length(course.getQuestions(false, 2, false))}" ></td>
+        <td width="700px">Dostępne pytania: <span th:each="Question : ${course.getQuestions(false, 2, false)}" ><a th:attr="href='../question/singleQuestion'+${Question.getIdquestion()}" th:text="${Question.getIdquestion()}"></a><span th:text="' , '" ></span></span> <span>Archiwalne: <span th:each="QuestionArchiwe : ${course.getQuestions(true, 2, false)}"><a th:attr="href='../question/singleQuestion'+${QuestionArchiwe.getIdquestion()}" th:text="${QuestionArchiwe.getIdquestion()}"></a><span th:text="' , '"></span></span ></span></td>
+      	<td width="50px" ><button class="details" data-th-attr="data-courseid=${course.getIdcourse()}, data-single=false, data-dificulty=2">Przeglądaj pytania</button></td> 
+      </tr>
+      <tr th:if="${#arrays.length(course.getQuestions(false, 3, false))} > 0">
+      	<td width="50px" >Stopień trudności 3</td>
+      	<td width="100px" th:text="'ilość :'+${#arrays.length(course.getQuestions(false, 3, false))}" ></td>
+        <td width="700px">Dostępne pytania: <span th:each="Question : ${course.getQuestions(false, 3, false)}" ><a th:attr="href='../question/singleQuestion'+${Question.getIdquestion()}" th:text="${Question.getIdquestion()}"></a><span th:text="' , '" ></span></span> <span>Archiwalne: <span th:each="QuestionArchiwe : ${course.getQuestions(true, 3, false)}"><a th:attr="href='../question/singleQuestion'+${QuestionArchiwe.getIdquestion()}" th:text="${QuestionArchiwe.getIdquestion()}"></a><span th:text="' , '"></span></span ></span></td>
+      	<td width="50px" ><button class="details" data-th-attr="data-courseid=${course.getIdcourse()}, data-single=false, data-dificulty=3">Przeglądaj pytania</button></td> 
+      </tr>
+      
+      <tr th:if="${!course.getArchive()}">
+        <td colspan="5" width="1000px"><button class="courseNameChange" th:value="${course.getIdcourse()}">Zmień nazwę kursu</button><button class="courseAddGroup" th:value="${course.getIdcourse()}">Dodaj grupe do kursu</button><button class="addQuestionToCourse" th:value="${course.getIdcourse()}">Dodaj pytanie do kursu</button><button class="moveToArchive" th:value="${course.getIdcourse()}" style="color: red;" >Przenieś do Arhiwum</button><button th:if="${course.canWeremove()}" class="removeCourse" th:value="${course.getIdcourse()}" style="color: red;" >Usuń Kurs</button></td>
+      </tr>
+      <tr th:if="${course.getArchive()}">
+        <td colspan="5" width="1000px"><button class="courseNameChange" th:value="${course.getIdcourse()}">Zmień nazwę kursu</button><button class="addQuestionToCourse" th:value="${course.getIdcourse()}">Dodaj pytanie do kursu</button><button class="moveFromArchive" th:value="${course.getIdcourse()}" style="color: red;" >Ustaw jako dostępny</button></td>
+      </tr>
+      
+    </table>
+</div>
+        </div>
+    </div>
+    <div id="footer">
+    	<p>
+				© Copyright 2018. All Rights Reserved. <br /> <span
+					class="darkgrey">Design by M.Wołoszkiewicz</span>
+			</p>
+    </div>
+    <script src="/js/adminpanel/course/courseQuestionManagement.js"></script> 
+    
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+

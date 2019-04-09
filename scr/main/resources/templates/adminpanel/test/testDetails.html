@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="Piotr Cyll" />
+	<meta name="Test service" />
+	<meta name="Service for testing students" content="piotr.cyll@gmail.com" />
+	<title>Testy</title>
+
+	<script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js'></script>
+	<link rel='stylesheet' href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css' />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="/css/adminpanel/adminpanel.css" />
+	<link rel="stylesheet" href="/css/adminpanel/adminpanel_right_site.css" />
+	<link href='http://fonts.googleapis.com/css?family=Asap:400,700' rel='stylesheet' type='text/css' />
+
+</head>
+
+<body>
+	<div id="wrapper">
+		<div id="top">
+			<h1 class="logo">
+				U<span class="green1">MCS</span> LUBLIN
+			</h1>
+			<ul id="topnavi">
+				<li id="start" class="btn"><a href="/app/index">Strona Startowa</a></li>
+				<li id="informacje" class="btn"><a href="/app/info">Informacje</a></li>
+				<li sec:authorize="hasRole('USER')" id="test" class="btn"><a href="/app/test">Testy</a></li>
+				<li id="logowanie" class="btn"><a href="/app/login">Logowanie</a></li>
+				<li id="Admin" class="active" sec:authorize="hasRole('ADMIN')"><a href="/admin/index">Panel Administratora</a></li>
+			</ul>
+		</div>
+		<div class="user" th:if="${login} != null">
+			<span class="logout" th:text="'Użytkownik: ' + ${login}"></span>
+			<form th:action="@{/app-logout}" method="POST">
+				<input class="logoutbutton" type="submit" value="Wyloguj" />
+			</form>
+		</div>
+		<div id="header">
+			<img src="/img/header.jpg" alt="" width="1250" height="183" />
+		</div>
+
+		<div id="main">
+			<div id="left-part">
+				<h1>Kategorie</h1>
+				<ul id="subnavi">
+					<li id="mainPanel" class="btn"><a href="/admin/index">Panel główny</a></li>
+                	<li id="groupManagement" class="btn"><a href="/admin/groupManagement">Zarządzanie grupami</a></li>
+                	<li id="courseManagement" class="btn"><a href="/admin/courseManagement">Zarządzanie kursami</a></li>
+                	<li id="accountManagement" class="btn"><a href="/admin/accountManagementAll/true">Zarządzanie użytkownikami</a></li>
+                	<li id="testManagement" class="active"><a href="/admin/testManagement">Zarządzanie testami</a></li>
+                	<li id="scoreAndResultManagement" class="btn"><a href="/admin/scoreAndResultManagement">Zarządzanie systemem ocen</a></li>
+				</ul>
+
+				<h1>Additional content</h1>
+				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+					Vestibulum ornare elementum neque at lobortis. Fusce ac orci diam.
+					Ut ac tellus in lorem commodo vulputate a vitae ligula. Proin nisl
+					lectus, lacinia id egestas eu, hendrerit id purus.</p>
+			</div>
+			<div id="right-part">
+				<table th:if="${testsetting} != null" id="test_details" >
+      <tr >
+        <th colspan="6" width="1000px" th:text="'Szczegóły testu '+${testsetting.getName_of_test()}"></th>
+      </tr>
+      <tr >
+        <td width="50px"><span>Data Testu: </span ><br><span style="font-weight: bold;" th:text="${testsetting.getDate_of_test()}"></span></td>
+        <td width="150px"><span>Ilość pytań: </span><span style="font-weight: bold;" th:text="${testsetting.getNumber_of_questions()}"></span></td>
+        <td width="120px"><span>Stopień trudności: </span><br>
+        <span style="font-weight: bold;"  th:if="${testsetting.getDificulty() == 1}" th:text="'Tylko 1'"></span>
+        <span style="font-weight: bold;"  th:if="${testsetting.getDificulty() == 2}" th:text="'1 do 2'"></span>
+        <span style="font-weight: bold;"  th:if="${testsetting.getDificulty() == 3}" th:text="'1 do 3'"></span>
+        <span style="font-weight: bold;"  th:if="${testsetting.getDificulty() == 4}" th:text="'Tylko 2'"></span>
+        <span style="font-weight: bold;"  th:if="${testsetting.getDificulty() == 5}" th:text="'2 do 3'"></span>
+        <span style="font-weight: bold;"  th:if="${testsetting.getDificulty() == 6}" th:text="'Tylko 3'"></span></td>
+        <td width="92px"><span>Kurs: </span><span style="font-weight: bold;" th:text="${testsetting.getCourseName()}"></span></td>
+      </tr>
+      <tr>
+        <td width="50px"><span>Uczestników: </span><br><span style="font-weight: bold;" th:text="${#arrays.length(testsetting.tests)}"></span></td>
+        <td width="150px" th:if="${testsetting.getSingle()}"><span>Test JW</span><span th:if="${testsetting.getSystem_score() != null}" style="font-weight: bold;" th:text="'( Max: '+${testsetting.getPossible_max_score()}+' Podp: '+${testsetting.getsystemScoreCorectPoint()}+' )'"></span><span th:unless="${testsetting.getSystem_score() != null}" th:text="' (Brak punktacji)'"></span></td>
+		<td width="150px" th:unless="${testsetting.getSingle()}"><span>Test WW</span><span th:if="${testsetting.getSystem_score() != null}" style="font-weight: bold;" th:text="'( Max: '+${testsetting.getPossible_max_score()}+' Podp: '+${testsetting.getsystemScoreCorectPoint()}+' Nodp: '+${testsetting.getsystemScoreIncorectPoint()}+' )'"></span><span th:unless="${testsetting.getSystem_score() != null}" th:text="' (Brak punktacji)'"></span></td>
+        <td width="120px" th:if="${testsetting.getEverRun() and testsetting.getAllTestEnd()}"><span>Status Testu: </span><br><span style="color: red;">Zakończony</span></td>
+        <td width="120px" th:if="${testsetting.getEverRun() and !testsetting.getAllTestEnd()}"><span>Status Testu: </span><br><span style="color: blue;">Trwa</span></td>
+        <td width="120px" th:unless="${testsetting.getEverRun()}"><span>Status Testu: </span><br><span style="color: green;">Nieprzeprowadzony</span></td>
+        <td width="92px"><form th:if="${testsetting.getCorrect()}" style="float: left;" th:action="@{'/testsettings/testControl'+${testsetting.getIdsettings()}}" method="GET"><input type="submit" value="Sterowanie&#13;&#10;Testem"/></form><form style="float: left;" th:action="@{'/testsettings/testEdit'+${testsetting.getIdsettings()}}" method="GET"><input th:unless="${testsetting.getCorrect()}" style="color: red;" type="submit" value="Ustawienia&#13;&#10;Testu"/><input th:if="${testsetting.getCorrect()}" type="submit" value="Ustawienia&#13;&#10;Testu"/></form></td>      
+      </tr>
+      <tr >   <!-- do poprawy wyświetlanie -->
+        <td width="50px">Testy uczestników:</td>
+        <td colspan="5"><span th:each="test : ${testsetting.getTests()}" >
+        <a th:if="${test.getResult()>2}" style="color: green;" th:attr="href='accountdetails'+${test.getUserTestId()}" th:text="${test.getNameAndSurnameUsersTest()}"></a>
+        <a th:unless="${test.getResult()>2}" style="color: red;" th:attr="href='accountdetails'+${test.getUserTestId()}" th:text="${test.getNameAndSurnameUsersTest()}"></a>
+        <span th:text="' ( '" ></span>
+        <a th:if="${test.getResult()>2 and test.getFirst_init()}" style="color:green;" th:value="${test.getIdtest()}" th:text="${test.getNameofCurseTest()}+'ocena:'+${test.getResult()}+' punkty:'+${test.getScore()}+'/'+${test.posibleMaxScore()}+' data:'+${test.dateOfTest()}"></a>
+        <a th:if="${test.getResult()<3 and test.getFirst_init()}" style="color:red;" th:value="${test.getIdtest()}" th:text="${test.getNameofCurseTest()}+'ocena:'+${test.getResult()}+' punkty:'+${test.getScore()}+'/'+${test.posibleMaxScore()}+' data:'+${test.dateOfTest()}"></a>
+        <span th:if="${!test.getFirst_init() and test.getTestEvenStart()}" style="color:red;" th:text="${test.getNameofCurseTest()}+'( Brak obecności na teście data:'+${test.dateOfTest()}+')'"></span>
+        <span th:if="${!test.getFirst_init() and !test.getTestEvenStart()}" style="color:red;" th:text="${test.getNameofCurseTest()}+'( Test jeszcze się nie odbył)'"></span>
+        <span th:text="' )'" ></span><br></span></td>
+      </tr>
+    </table>
+			</div>
+		</div>
+		<div id="footer">
+			<p>
+				© Copyright 2018. All Rights Reserved. <br /> <span
+					class="darkgrey">Design by M.Wołoszkiewicz</span>
+			</p>
+		</div>
+
+
+	</div>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+

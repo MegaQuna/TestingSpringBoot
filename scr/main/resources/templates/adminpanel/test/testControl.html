@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta name="Piotr Cyll" />
+	<meta name="Test service" />
+	<meta name="Service for testing students" content="piotr.cyll@gmail.com" />
+	<title>Testy</title>
+
+	<script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js'></script>
+	<link rel='stylesheet' href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css' />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="/css/adminpanel/adminpanel.css" />
+	<link rel="stylesheet" href="/css/adminpanel/adminpanel_right_site.css" />
+	<link href='http://fonts.googleapis.com/css?family=Asap:400,700' rel='stylesheet' type='text/css' />
+
+</head>
+
+<body>
+	<div id="wrapper">
+		<div id="top">
+			<h1 class="logo">
+				U<span class="green1">MCS</span> LUBLIN
+			</h1>
+			<ul id="topnavi">
+				<li id="start" class="btn"><a href="/app/index">Strona Startowa</a></li>
+				<li id="informacje" class="btn"><a href="/app/info">Informacje</a></li>
+				<li sec:authorize="hasRole('USER')" id="test" class="btn"><a href="/app/test">Testy</a></li>
+				<li id="logowanie" class="btn"><a href="/app/login">Logowanie</a></li>
+				<li id="Admin" class="active" sec:authorize="hasRole('ADMIN')"><a href="/admin/index">Panel Administratora</a></li>
+			</ul>
+		</div>
+		<div class="user" th:if="${login} != null">
+			<span class="logout" th:text="'Użytkownik: ' + ${login}"></span>
+			<form th:action="@{/app-logout}" method="POST">
+				<input class="logoutbutton" type="submit" value="Wyloguj" />
+			</form>
+		</div>
+		<div id="header">
+			<img src="/img/header.jpg" alt="" width="1250" height="183" />
+		</div>
+
+		<div id="main">
+			<div id="left-part">
+				<h1>Kategorie</h1>
+				<ul id="subnavi">
+					<li id="mainPanel" class="btn"><a href="/admin/index">Panel główny</a></li>
+                	<li id="groupManagement" class="btn"><a href="/admin/groupManagement">Zarządzanie grupami</a></li>
+                	<li id="courseManagement" class="btn"><a href="/admin/courseManagement">Zarządzanie kursami</a></li>
+                	<li id="accountManagement" class="btn"><a href="/admin/accountManagementAll/true">Zarządzanie użytkownikami</a></li>
+                	<li id="testManagement" class="active"><a href="/admin/testManagement">Zarządzanie testami</a></li>
+                	<li id="scoreAndResultManagement" class="btn"><a href="/admin/scoreAndResultManagement">Zarządzanie systemem ocen</a></li>
+				</ul>
+
+				<h1>Additional content</h1>
+				<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+					Vestibulum ornare elementum neque at lobortis. Fusce ac orci diam.
+					Ut ac tellus in lorem commodo vulputate a vitae ligula. Proin nisl
+					lectus, lacinia id egestas eu, hendrerit id purus.</p>
+			</div>
+			<div id="right-part">
+				<table>
+					<tr>
+						<th width="1000px"style="border: none;" colspan="4" ><span th:text="'Ustawienia testu'"></span></th>
+					</tr>
+					<tr>
+						<td width="500px" th:if="${testsetting.getSingle() and testsetting.getSingle() != null}" style="border: none; text-align: left;" ><span style="font-weight: bold;">Test: </span><span style="font-weight: bold; color: green;" >Pojedyńczego wyboru (JW)</span></td>
+						<td width="500px" th:if="${!testsetting.getSingle() and testsetting.getSingle() != null }" style="border: none; text-align: left;" ><span style="font-weight: bold;">Test: </span><span style="font-weight: bold; color: green;" >Wielokrotnego wyboru (WW)</span></td>
+						<td width="500px" th:if="${testsetting.getSingle() == null}" style="border: none; text-align: left;" ><span style="font-weight: bold;">Test: </span><span style="font-weight: bold; color: red;" >Brak ustawień</span></td>
+						<th:block th:if="${testsetting.getSystem_result() != null}">
+						<td th:if="${testsetting.getSystemResultToString() != null}" style="border: none; text-align: left;"><span style="font-weight: bold;">System ocen: </span><span style="font-weight: bold; color: green;" th:text="${testsetting.getSystemResultToString()}"></span></td>
+						<td th:if="${testsetting.getSystemResultToString() == null}" style="border: none; text-align: left;"><span style="font-weight: bold;">System ocen: </span><span style="font-weight: bold; color: red;" th:text="'Brak ustawień'"></span></td>
+						</th:block>
+						<th:block th:if="${testsetting.getSystem_result() == null}">
+						<td style="border: none; text-align: left;"><span style="font-weight: bold;">System ocen: </span><span style="font-weight: bold; color: red;" th:text="'Brak systemu ocen'"></span></td>
+						</th:block>
+					</tr>
+					<tr>
+						<td style="border: none; text-align: left;" ><span style="font-weight: bold;">Opis testu: </span><span style="font-weight: bold; color: green;" th:text="${testsetting.getName_of_test()}" ></span></td>
+						<td style="border: none; text-align: left;"><span style="font-weight: bold;">System punktacji: </span>
+						<th:block th:if="${systemscore != null}">
+						<span style="font-weight: bold; color: green;" th:if="${systemscore.getSingle()}" th:value="${systemscore.getIdsystemscore()}" th:text="'Pop :('+${systemscore.getPoint_for_corect()}+')'"></span>
+						<span style="font-weight: bold; color: green;" th:if="${!systemscore.getSingle() and systemscore.getOnly_corect()}" th:value="${systemscore.getIdsystemscore()}" th:text="'Pop :('+${systemscore.getPoint_for_corect()}+')'"></span>
+						<span style="font-weight: bold; color: green;" th:if="${!systemscore.getSingle() and !systemscore.getOnly_corect()}" th:value="${systemscore.getIdsystemscore()}" th:text="'Pop:('+${systemscore.getPoint_for_corect()}+') Npop:('+${systemscore.getPoint_for_incorect()}+')'"></span>
+						</th:block >	
+						<th:block th:unless="${systemscore != null}">
+							<span style="font-weight: bold; color: red;" th:text="'Brak systemu punktacji'"></span>
+						</th:block>
+						</td>
+					</tr>
+					<tr>
+						<td th:if="${testsetting.getDificulty() != null}" style="border: none; text-align: left;"><span style="font-weight: bold;">Stopień trudności: </span>
+						<span style="font-weight: bold; color: green;" th:if="${testsetting.getDificulty() == 1}" th:text="'1'"></span>
+						<span style="font-weight: bold; color: green;" th:if="${testsetting.getDificulty() == 2}" th:text="'Od 1 do 2'"></span>
+						<span style="font-weight: bold; color: green;" th:if="${testsetting.getDificulty() == 3}" th:text="'Od 1 do 3'"></span>
+						<span style="font-weight: bold; color: green;" th:if="${testsetting.getDificulty() == 4}" th:text="'2'"></span>
+						<span style="font-weight: bold; color: green;" th:if="${testsetting.getDificulty() == 5}" th:text="'Od 2 do 3'"></span>
+						<span style="font-weight: bold; color: green;" th:if="${testsetting.getDificulty() == 6}" th:text="'3'"></span></td>
+						<td th:if="${testsetting.getDificulty() == null}" style="border: none; text-align: left;"><span style="font-weight: bold;">Stopień trudności: </span>
+						<span style="font-weight: bold; color: red;" th:text="'Brak ustawień'"></span></td>
+												
+						<td th:if="${testsetting.getNumber_of_questions() !=null }" style="border: none; text-align: left;"><span style="font-weight: bold;">Ilość pytań: </span><span th:if="${testsetting.getNumber_of_questions()>0}" style="font-weight: bold; color: green;" th:text="${testsetting.getNumber_of_questions()}"></span>
+						<span th:unless="${testsetting.getNumber_of_questions()>0}" style="font-weight: bold; color: red;" th:text="${testsetting.getNumber_of_questions()}"></span></td>
+						<td th:if="${testsetting.getNumber_of_questions() ==null }" style="border: none; text-align: left;"><span style="font-weight: bold;">Ilość pytań: </span>
+						<span style="font-weight: bold; color: red;" th:text="'Brak ustawień'"></span></td>
+					</tr>
+					<tr>
+						<td  style="border: none; text-align: left;"><span style="font-weight: bold;">Kurs: </span><span style="font-weight: bold; color: green;" th:text="${testsetting.getCourseName()}"></span></td>
+						<td style="border: none; text-align: left;" ><span style="font-weight: bold;">Max ilość punktów: </span><span th:if="${testsetting.getPossible_max_score()> 0}" style="font-weight: bold; color: green;" th:text="${testsetting.getPossible_max_score()}" ></span>
+						<span th:unless="${testsetting.getPossible_max_score()> 0}" style="font-weight: bold; color: red;" th:text="${testsetting.getPossible_max_score()}" ></span></td>
+					</tr>
+					<tr>
+						<td style="border: none; text-align: left;"><span style="font-weight: bold;">Czas na test: </span><span th:if="${testsetting.getTime_for_test()>0}" style="font-weight: bold; color: green;" th:text="${testsetting.getTime_for_test()+' min'}"></span><span th:unless="${testsetting.getTime_for_test()>0}" style="font-weight: bold; color: red;" th:text="'0 min'"></span> </td>
+					</tr>		
+				</table>
+				<table >
+					<tr style="border: none; text-align: left;">
+						<td style="border: none; text-align: left;"><form th:action="@{'/testsettings/activateAllTest'+${testsetting.getIdsettings()}}" method="POST"><input type="submit" value="Włącz wszystkie testy"/></form></td>
+						<td style="border: none; text-align: left;"><form th:action="@{'/testsettings/deactivateAllTest'+${testsetting.getIdsettings()}}" method="POST"><input type="submit" value="Wyłącz wszystkie testy"/></form></td>
+						<td th:if="${!testsetting.getWasRating() and !systemresultList.isEmpty()}" style="border: none; text-align: left;"><form th:action="@{'/testsettings/changeSystemResultTest'+${testsetting.getIdsettings()}}" method="POST">
+						<select name="systemResult">
+    						<option th:each="systemresult : ${systemresultList}" th:value="${systemresult.getIdsystemResult()}" th:text="${systemresult.getToString()}"/>
+						</select> 
+						<input type="submit" value="Zmień system ocen"/>
+						</form></td>
+						<td style="border: none; text-align: left;"><form th:action="@{'/testsettings/ratingAllTest'+${testsetting.getIdsettings()}}" method="POST"><input type="submit" value="Oceń wszystkie testy"/></form></td>
+					</tr>
+				</table>	
+				<table>
+					<tr style="border: none;">
+						<td style="border: none;"><table style="border: none; text-align: left;">
+							<tr style="border: none; text-align: left;" th:each="test : ${tests}">
+								<td style="border: none; text-align: left;">
+									<span style="font-weight: bold;" th:text="${test.getNameAndSurnameUsersTest()}+':'"></span>
+									<span style="color: green;" th:if="${test.getFirst_init() and test.getAvailable()}" th:text="' W trakcie rozwiązywania'"></span>
+									<span style="color: #f4b042;" th:if="${!test.getFirst_init() and test.getAvailable()}" th:text="' Gotowy do rozwiązywania'"></span>
+									<span style="color: red;" th:if="${!test.getFirst_init() and !test.getAvailable()}" th:text="' Nierozpoczęty'"></span>
+									<a th:href="@{'/testsettings/preview'+${test.getIdtest()}}" th:if="${test.getFirst_init() and !test.getAvailable() and !test.getRating()}"><span style="color: #42c2f4;" th:if="${test.getFirst_init() and !test.getAvailable() and !test.getRating()}" ><span th:text="' Zakoń. nieoceniony  '+${#dates.format(test.getDate_of_end(), 'dd-MM HH:mm')}+' (Punkty:'+${test.getScore()}+'/'+${testsetting.getPossible_max_score()}"></span>
+									<span th:if="${test.getResult()>2}" style="color: green;" th:text="' Ocena:'+${test.getResult()}"></span>
+									<span th:unless="${test.getResult()>2}" style="color: red;" th:text="' Ocena:'+${test.getResult()}"></span>
+									<span style="color: #42c2f4;" th:text="' )'"></span>
+									</span></a>
+									<a th:href="@{'/testsettings/preview'+${test.getIdtest()}}" th:if="${test.getFirst_init() and !test.getAvailable() and test.getRating()}"><span style="color: #6213a3;" th:if="${test.getFirst_init() and !test.getAvailable() and test.getRating()}" ><span th:text="' Zakoń. oceniony '+${#dates.format(test.getDate_of_end(), 'dd-MM HH:mm')}+' (Punkty:'+${test.getScore()}+'/'+${testsetting.getPossible_max_score()}"></span>
+									<span th:if="${test.getResult()>2}" style="color: green;" th:text="' Ocena:'+${test.getResult()}"></span>
+									<span th:unless="${test.getResult()>2}" style="color: red;" th:text="' Ocena:'+${test.getResult()}"></span>
+									<span style="color: #6213a3;" th:text="' )'"></span>
+									</span></a>
+								</td>
+								<td style="border: none; text-align: left;" th:if="${!test.getFirst_init() and !test.getAvailable()}">
+									<form th:action="@{'/testsettings/activateTest'+${test.getIdtest()}}" method="POST"><input type="submit" value="Włącz"/></form>
+								</td>
+								<td style="border: none; text-align: left;" th:if="${test.getAvailable()}">
+									<form th:action="@{'/testsettings/deactivateTest'+${test.getIdtest()}}" method="POST"><input type="submit" value="Wyłącz"/></form>
+								</td>
+								<td style="border: none; text-align: left;" th:if="${test.getFirst_init() and !test.getAvailable() and !test.getRating()}">
+									<form th:action="@{'/testsettings/ratingTest'+${test.getIdtest()}}" method="POST"><input type="submit" value="Oceń"/></form>
+								</td>
+								<td style="border: none; text-align: left;" th:if="${test.getFirst_init() and !test.getAvailable() and !test.getRating()}">
+									<form th:action="@{'/testsettings/addTimeTest'+${test.getIdtest()}}" method="POST"><input type="number" name="time" value="1" max="90" min="1" style="width: 35px;" /><input type="submit" value="Dodaj min"/></form>
+								</td>
+							</tr>
+						</table></td>
+					</tr>
+					<tr>
+						<td style="border: none; text-align: left;"><form style="display: inline-block;" th:action="@{'/testsettings/testControl'+${testsetting.getIdsettings()}}" method="GET"><input type="submit" value="Odśwież widok"/></form>
+						<form style="display: inline-block;" th:action="@{'/admin/testdetail'+${testsetting.getIdsettings()}}" method="GET"><input type="submit" value="Wróć do szczegółów testu"/></form>
+						<form style="display: inline-block;" th:action="@{'/testsettings/creatPDF'+${testsetting.getIdsettings()}}" method="POST"><input type="submit" value="Pobierz Pdf"/></form></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+		<div id="footer">
+			<p>
+				© Copyright 2018. All Rights Reserved. <br /> <span
+					class="darkgrey">Design by M.Wołoszkiewicz</span>
+			</p>
+		</div>
+
+
+	</div>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
